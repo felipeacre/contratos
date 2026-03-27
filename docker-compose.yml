@@ -20,7 +20,7 @@ services:
       DB_USER: root
       DB_PASS: root
     volumes:
-      - ./uploads:/opt/uploads   # persiste uploads fora do container
+      - ./uploads:/var/www/html/uploads   # persiste uploads fora do container
     depends_on:
       db:
         condition: service_healthy
