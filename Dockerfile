@@ -24,8 +24,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN docker-php-ext-install pdo pdo_mysql zip
 
 # ── 3. Biblioteca Python para extração de PDF ────────────────
-# Sem --break-system-packages (flag não existe no Debian Bullseye)
-RUN pip3 install --no-cache-dir pdfplumber
+# --break-system-packages necessário no Debian Bookworm (PEP 668)
+RUN pip3 install --no-cache-dir --break-system-packages pdfplumber
 
 # ── 4. Apache: mod_rewrite + AllowOverride ───────────────────
 RUN a2enmod rewrite \
