@@ -13,7 +13,7 @@ services:
     container_name: contratos_app
     restart: unless-stopped
     ports:
-      - "1666:80"
+      - "8080:80"
     environment:
       DB_HOST: db
       DB_NAME: contratos_idaf
