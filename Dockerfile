@@ -3,12 +3,15 @@
 # Base: PHP 8.1 + Apache (Debian Bullseye)
 # ============================================================
 
-FROM php:8.1-apache
+FROM php:8.3-apache
 
 # ── 1. Pacotes do sistema ─────────────────────────────────────
-# Camada separada: muda raramente → fica no cache
+# libpng/libjpeg/libfreetype → necessários para ext-gd (phpspreadsheet)
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libzip-dev \
+        libpng-dev \
+        libjpeg62-turbo-dev \
+        libfreetype6-dev \
         zip \
         unzip \
         git \
@@ -20,8 +23,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # ── 2. Extensões PHP ─────────────────────────────────────────
-# mbstring e fileinfo já vêm na imagem base — só pdo_mysql e zip precisam ser compilados
-RUN docker-php-ext-install pdo pdo_mysql zip
+# gd: configura suporte a jpeg e freetype antes de compilar
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql zip gd
 
 # ── 3. Biblioteca Python para extração de PDF ────────────────
 # --break-system-packages necessário no Debian Bookworm (PEP 668)
