@@ -1,0 +1,25 @@
+# ── Dependências ──────────────────────────────────────────────
+vendor/
+node_modules/
+
+# ── Uploads (não versionar arquivos de usuário) ───────────────
+uploads/pdfs/*
+uploads/imports/*
+!uploads/pdfs/.gitkeep
+!uploads/imports/.gitkeep
+
+# ── Ambiente ──────────────────────────────────────────────────
+.env
+.env.local
+
+# ── IDE / OS ──────────────────────────────────────────────────
+.idea/
+.vscode/
+*.DS_Store
+Thumbs.db
+
+# ── Logs ──────────────────────────────────────────────────────
+*.log
+
+# ── Docker (dados persistentes) ───────────────────────────────
+db_data/

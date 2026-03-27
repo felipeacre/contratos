@@ -1,0 +1,6 @@
+{
+    "name": "idaf/contratos",
+    "require": {
+        "phpoffice/phpspreadsheet": "^5.5"
+    }
+}

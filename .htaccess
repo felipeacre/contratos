@@ -1,0 +1,5 @@
+# Bloqueia acesso direto às pastas sensíveis
+Options -Indexes
+
+# Redireciona raiz para login (opcional — ajuste se o sistema ficar em subpasta)
+# DirectoryIndex login.php

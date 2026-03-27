@@ -1,0 +1,408 @@
+/* ============================================================
+   assets/css/app.css — Contratos IDAF/AC
+   ============================================================ */
+
+:root {
+    --idaf-primary:   #1a3c5e;
+    --idaf-secondary: #2a6496;
+    --idaf-accent:    #f39c12;
+    --status-vencido:  #dc3545;
+    --status-critico:  #fd7e14;
+    --status-atencao:  #ffc107;
+    --status-alerta:   #0dcaf0;
+    --status-regular:  #198754;
+}
+
+/* Navbar */
+#main-navbar {
+    background: linear-gradient(135deg, var(--idaf-primary), var(--idaf-secondary));
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+
+/* Sidebar de status — cards do painel */
+.card-status {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+.card-status:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,.12);
+}
+.card-status .display-4 {
+    font-weight: 700;
+}
+
+/* Status colors */
+.card-vencido  { border-left: 6px solid var(--status-vencido) !important; }
+.card-critico  { border-left: 6px solid var(--status-critico) !important; }
+.card-atencao  { border-left: 6px solid var(--status-atencao) !important; }
+.card-alerta   { border-left: 6px solid var(--status-alerta) !important; }
+.card-regular  { border-left: 6px solid var(--status-regular) !important; }
+
+/* Badge personalizado para atenção */
+.badge.bg-atencao {
+    background-color: var(--status-atencao) !important;
+    color: #000;
+}
+
+/* Tabelas */
+.table-hover tbody tr:hover {
+    background-color: rgba(26,60,94,.06);
+}
+
+/* Footer */
+.footer {
+    border-top: 1px solid #dee2e6;
+    background: #f8f9fa;
+}
+
+/* Linha vencida na tabela */
+tr.row-vencido { background-color: rgba(220,53,69,.07) !important; }
+tr.row-critico { background-color: rgba(253,126,20,.07) !important; }
+tr.row-atencao { background-color: rgba(255,193,7,.06) !important; }
+
+/* ============================================================
+   DASHBOARD TV — Painel Operacional (Full HD, leitura a 3m)
+   ============================================================ */
+
+body.tv-mode {
+    background: #07090f;
+    color: #e8eaf0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+.tv-header {
+    background: #0d1828;
+    border-bottom: 4px solid #f39c12;
+    padding: 8px 40px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    flex-shrink: 0;
+}
+.tv-header-logo {
+    /* alinhado à esquerda, já padrão */
+}
+.tv-header-clock {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.tv-header-date {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+.tv-header .logo-text {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: .5px;
+    line-height: 1;
+}
+.tv-header .logo-sub {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+    margin-top: 4px;
+    opacity: .85;
+}
+.tv-header .clock {
+    font-size: 4rem;
+    font-weight: 700;
+    color: #f39c12;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+.tv-header .tv-date {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #d0e0f0;
+    text-align: right;
+    margin-top: 0;
+    font-weight: 500;
+}
+
+/* ── RESUMO RÁPIDO (5 cards horizontais) ────────────────── */
+.tv-cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    padding: 8px 40px;
+    flex-shrink: 0;
+}
+.tv-stat {
+    border-radius: 8px;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    overflow: hidden;
+}
+.tv-stat .num {
+    font-size: 7rem;
+    font-weight: 900;
+    line-height: 1;
+    flex-shrink: 0;
+    color: #fff;
+}
+.tv-stat .label {
+    font-size: 1.45rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #fff;
+    opacity: .9;
+    line-height: 1.4;
+}
+.tv-stat.s-vencido { background: #1e050a; border: 2px solid #7a1522; }
+.tv-stat.s-critico { background: #1e0e00; border: 2px solid #7a3c00; }
+.tv-stat.s-atencao { background: #191400; border: 2px solid #7a6200; }
+.tv-stat.s-alerta  { background: #001520; border: 2px solid #006080; }
+.tv-stat.s-regular { background: #030f08; border: 2px solid #0d5c28; }
+.tv-stat.s-vencido .num { color: #ff5566; }
+.tv-stat.s-critico .num { color: #ff9933; }
+.tv-stat.s-atencao .num { color: #ffcc00; }
+.tv-stat.s-alerta  .num { color: #33ccee; }
+.tv-stat.s-regular .num { color: #44dd88; }
+
+/* ── ÁREA PRINCIPAL: 4 colunas ──────────────────────────── */
+.tv-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 8px 40px 10px;
+    flex: 1;
+    min-height: 0;
+}
+
+/* ── SEÇÃO (coluna) ──────────────────────────────────────── */
+.tv-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+}
+.tv-section-header {
+    padding: 9px 18px;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+}
+.tv-section-header .sec-count {
+    font-size: 1.8rem;
+    font-weight: 900;
+    line-height: 1;
+}
+.tv-section-header.sh-criticos  { background: #1e0710; color: #ff5566; border-bottom: 3px solid #aa1122; }
+.tv-section-header.sh-atencao   { background: #141000; color: #ffcc00; border-bottom: 3px solid #aa8800; }
+.tv-section-header.sh-tranquilo { background: #030f08; color: #44dd88; border-bottom: 3px solid #0d7040; }
+.tv-section-header.sh-licitacoes{ background: #001520; color: #33ccee; border-bottom: 3px solid #006080; }
+
+.tv-section-body {
+    flex: 1;
+    overflow: hidden;
+    background: #0c1018;
+    border-radius: 0 0 8px 8px;
+    position: relative;
+}
+.tv-section-scroll {
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* ── CARD DE CONTRATO ────────────────────────────────────── */
+.tv-card {
+    display: flex;
+    align-items: stretch;
+    min-height: 105px;
+    border-radius: 7px;
+    overflow: hidden;
+    background: #111928;
+}
+
+/* Borda lateral colorida por urgência */
+.tv-card.bc-vencido  { border-left: 7px solid #cc1122; }
+.tv-card.bc-urgente  { border-left: 7px solid #ff3300; }
+.tv-card.bc-critico  { border-left: 7px solid #cc6600; }
+.tv-card.bc-atencao  { border-left: 7px solid #cc9900; }
+.tv-card.bc-tranquilo{ border-left: 7px solid #0d7040; }
+
+/* Lado esquerdo: número + fornecedor */
+.tv-card-info {
+    flex: 1;
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    min-width: 0;
+}
+.tv-card-num {
+    font-size: 1.5rem;       /* ~24px */
+    font-weight: 700;
+    color: #7a9abf;
+    line-height: 1;
+    letter-spacing: .5px;
+}
+.tv-card-forn {
+    font-size: 1.75rem;      /* ~28px */
+    font-weight: 600;
+    color: #e8f0f8;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.15;
+}
+
+/* Lado direito: badge do prazo (bloco sólido, altura total) */
+.tv-card-badge {
+    width: 155px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;         /* ~48px */
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+    letter-spacing: 1px;
+    padding: 0 10px;
+    text-align: center;
+}
+.tv-card-badge .badge-unit {
+    font-size: .5em;
+    font-weight: 700;
+    letter-spacing: 3px;
+    opacity: .85;
+    margin-top: 3px;
+    display: block;
+}
+
+/* Cores sólidas dos badges */
+.b-vencido  { background: #6b0a14; }
+.b-urgente  { background: #8b1a00; }
+.b-critico  { background: #6b3300; }
+.b-atencao  { background: #5a4400; }
+.b-tranquilo{ background: #084d20; }
+
+/* ── ANIMAÇÕES ───────────────────────────────────────────── */
+@keyframes pulse-urgente {
+    0%   { background: #8b1a00; }
+    50%  { background: #dd2200; }
+    100% { background: #8b1a00; }
+}
+@keyframes pulse-vencido {
+    0%   { background: #6b0a14; }
+    50%  { background: #bb1122; }
+    100% { background: #6b0a14; }
+}
+
+.tv-card-badge.b-urgente { animation: pulse-urgente 1.3s ease-in-out infinite; }
+.tv-card-badge.b-vencido { animation: pulse-vencido 1.8s ease-in-out infinite; }
+
+/* ── CARD DE LICITAÇÃO (compacto) ────────────────────────── */
+.tv-lic-card {
+    background: #0d1828;
+    border-radius: 7px;
+    border-left: 6px solid #006080;
+    padding: 14px 16px;
+    min-height: 85px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+}
+.tv-lic-num {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #c0d0e0;
+    line-height: 1;
+}
+.tv-lic-obj {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #607080;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tv-lic-status {
+    font-size: .9rem;
+    font-weight: 700;
+    margin-top: 2px;
+}
+
+/* Vazio */
+.tv-empty-msg {
+    padding: 32px 20px;
+    text-align: center;
+    font-size: 1.2rem;
+    color: #1e3040;
+}
+
+/* ── CARROSSEL HORIZONTAL ────────────────────────────────── */
+.tv-carousel-wrap {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+.tv-carousel-track {
+    display: flex;
+    height: 100%;
+    will-change: transform;
+    transition: none;
+}
+.tv-carousel-page {
+    flex-shrink: 0;
+    width: 100%;
+    height: 100%;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow: hidden;
+    align-content: flex-start;
+}
+.tv-page-indicator {
+    position: absolute;
+    bottom: 8px;
+    right: 10px;
+    font-size: 1.6rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: #fff;
+    background: rgba(255,255,255,.12);
+    border: 2px solid rgba(255,255,255,.25);
+    padding: 6px 20px;
+    border-radius: 24px;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Animação de atualização */
+@keyframes tv-refresh-pulse {
+    0%,100% { opacity: 1; }
+    50%     { opacity: .35; }
+}
+.refreshing { animation: tv-refresh-pulse .6s ease; }

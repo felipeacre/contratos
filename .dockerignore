@@ -1,0 +1,21 @@
+# ── Git e IDE ─────────────────────────────────────────────────
+.git
+.gitignore
+.idea
+.vscode
+
+# ── Dependências (recriadas no build) ─────────────────────────
+vendor/
+node_modules/
+
+# ── Dados locais ──────────────────────────────────────────────
+uploads/pdfs/*
+uploads/imports/*
+
+# ── Arquivos sensíveis ────────────────────────────────────────
+.env
+.env.local
+*.env
+
+# ── Logs ──────────────────────────────────────────────────────
+*.log
