@@ -1,12 +1,13 @@
 # ============================================================
 # Dockerfile — Contratos IDAF/AC
-# Base: PHP 8.1 + Apache
+# Base: PHP 8.1 + Apache (Debian Bullseye)
 # ============================================================
 
 FROM php:8.1-apache
 
-# ── Dependências do sistema ──────────────────────────────────
-RUN apt-get update && apt-get install -y \
+# ── 1. Pacotes do sistema ─────────────────────────────────────
+# Camada separada: muda raramente → fica no cache
+RUN apt-get update && apt-get install -y --no-install-recommends \
         libzip-dev \
         zip \
         unzip \
@@ -14,42 +15,41 @@ RUN apt-get update && apt-get install -y \
         curl \
         python3 \
         python3-pip \
-    && docker-php-ext-install \
-        pdo \
-        pdo_mysql \
-        mbstring \
-        fileinfo \
-        zip \
-    && pip3 install pdfplumber --break-system-packages \
+        python3-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# ── Apache: habilita mod_rewrite ────────────────────────────
-RUN a2enmod rewrite
+# ── 2. Extensões PHP ─────────────────────────────────────────
+# mbstring e fileinfo já vêm na imagem base — só pdo_mysql e zip precisam ser compilados
+RUN docker-php-ext-install pdo pdo_mysql zip
 
-# Permite .htaccess sobrescrever configurações
-RUN sed -i 's/AllowOverride None/AllowOverride All/g' \
+# ── 3. Biblioteca Python para extração de PDF ────────────────
+# Sem --break-system-packages (flag não existe no Debian Bullseye)
+RUN pip3 install --no-cache-dir pdfplumber
+
+# ── 4. Apache: mod_rewrite + AllowOverride ───────────────────
+RUN a2enmod rewrite \
+    && sed -i 's/AllowOverride None/AllowOverride All/g' \
         /etc/apache2/apache2.conf
 
-# ── PHP: ajustes de upload e memória ────────────────────────
-RUN printf "upload_max_filesize = 25M\n\
-post_max_size = 25M\n\
-memory_limit = 256M\n\
-max_execution_time = 120\n" \
+# ── 5. PHP: ajustes de upload e memória ──────────────────────
+RUN printf "upload_max_filesize = 25M\npost_max_size = 25M\nmemory_limit = 256M\nmax_execution_time = 120\n" \
     > /usr/local/etc/php/conf.d/contratos.ini
 
-# ── Composer ────────────────────────────────────────────────
+# ── 6. Composer ──────────────────────────────────────────────
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# ── Código da aplicação ──────────────────────────────────────
+# ── 7. Código da aplicação ───────────────────────────────────
 WORKDIR /var/www/html
 
+# Copia composer.json primeiro para aproveitar cache de dependências
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+
+# Copia o restante do projeto
 COPY . .
 
-# Instala dependências PHP (sem dev)
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-# ── Permissões dos uploads ───────────────────────────────────
+# ── 8. Permissões dos uploads ────────────────────────────────
 RUN mkdir -p uploads/pdfs uploads/imports \
     && chown -R www-data:www-data uploads \
     && chmod -R 775 uploads
