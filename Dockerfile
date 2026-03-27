@@ -54,8 +54,17 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 COPY . .
 
 # ── 8. Permissões dos uploads ────────────────────────────────
+# chown aqui resolve sem volume; o entrypoint resolve com volume montado
 RUN mkdir -p uploads/pdfs uploads/imports \
     && chown -R www-data:www-data uploads \
     && chmod -R 775 uploads
+
+# ── 9. Entrypoint ─────────────────────────────────────────────
+# Corrige permissões do volume a cada restart antes de subir o Apache
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint-contratos.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint-contratos.sh
+
+ENTRYPOINT ["docker-entrypoint-contratos.sh"]
+CMD ["apache2-foreground"]
 
 EXPOSE 80
