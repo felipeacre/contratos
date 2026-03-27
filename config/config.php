@@ -5,9 +5,12 @@
 
 define('APP_NAME', 'Contratos IDAF/AC');
 define('APP_VERSION', '1.0.0');
-// Detecta automaticamente o host (funciona com localhost e acesso por IP na rede)
-define('BASE_URL', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
-    . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/contratos');
+// BASE_URL: sempre http (sem SSL).
+// APP_SUBDIR controla o subdiretório:
+//   Docker      → APP_SUBDIR=''        → http://10.26.9.11:1666
+//   Laragon     → APP_SUBDIR=/contratos (padrão)
+$_subdir = getenv('APP_SUBDIR') !== false ? getenv('APP_SUBDIR') : '/contratos';
+define('BASE_URL', 'http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . rtrim($_subdir, '/'));
 define('BASE_PATH', dirname(__DIR__));
 
 // Banco de dados — lê variáveis de ambiente (Docker) ou usa padrão local
