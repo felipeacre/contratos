@@ -5,12 +5,15 @@
 
 define('APP_NAME', 'Contratos IDAF/AC');
 define('APP_VERSION', '1.0.0');
-// BASE_URL: sempre http (sem SSL).
-// APP_SUBDIR controla o subdiretório:
-//   Docker      → APP_SUBDIR=''        → http://10.26.9.11:1666
-//   Laragon     → APP_SUBDIR=/contratos (padrão)
-$_subdir = getenv('APP_SUBDIR') !== false ? getenv('APP_SUBDIR') : '/contratos';
-define('BASE_URL', 'http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . rtrim($_subdir, '/'));
+// BASE_URL — ordem de prioridade:
+//   1. APP_BASE_URL (env var) → valor exato, sem lógica nenhuma  ← Docker usa isso
+//   2. Fallback automático para Laragon local
+if (getenv('APP_BASE_URL') !== false && getenv('APP_BASE_URL') !== '') {
+    define('BASE_URL', rtrim(getenv('APP_BASE_URL'), '/'));
+} else {
+    $_subdir = getenv('APP_SUBDIR') !== false ? getenv('APP_SUBDIR') : '/contratos';
+    define('BASE_URL', 'http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . rtrim($_subdir, '/'));
+}
 define('BASE_PATH', dirname(__DIR__));
 
 // Banco de dados — lê variáveis de ambiente (Docker) ou usa padrão local

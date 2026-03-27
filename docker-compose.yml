@@ -19,7 +19,8 @@ services:
       DB_NAME: contratos_idaf
       DB_USER: root
       DB_PASS: root
-      APP_SUBDIR: ""        # raiz do container já é /contratos — sem subdiretório
+      APP_SUBDIR: ""
+      APP_BASE_URL: "http://10.26.9.11:1666"   # URL exata — edite se o IP/porta mudar
     volumes:
       - ./uploads:/var/www/html/uploads   # persiste uploads fora do container
     depends_on:
