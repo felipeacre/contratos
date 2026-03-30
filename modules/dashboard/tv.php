@@ -221,6 +221,44 @@ if ($json_mode) {
     scrollReset['tranquilo'] = initTvCarousel('tv-scroll-tranquilo', 8000);
 
     initTvRefresh(60);
+
+    // ── Tela cheia automática ──────────────────────────────────────
+    // Android TV pode bloquear requestFullscreen sem gesto do usuário.
+    // Tenta no carregamento; se falhar, aguarda o primeiro toque/clique.
+    function goFullscreen() {
+        var el = document.documentElement;
+        var fn = el.requestFullscreen
+               || el.webkitRequestFullscreen   // Safari / WebView antigo
+               || el.mozRequestFullScreen
+               || el.msRequestFullscreen;
+        if (fn) fn.call(el);
+    }
+
+    // Tentativa 1: direto no load (funciona se o browser permitir)
+    window.addEventListener('load', function() {
+        try { goFullscreen(); } catch(e) {}
+    });
+
+    // Tentativa 2: primeiro gesto do usuário (necessário em muitos Android TV)
+    var _fsOnce = false;
+    function _fsGesture() {
+        if (_fsOnce) return;
+        _fsOnce = true;
+        try { goFullscreen(); } catch(e) {}
+        document.removeEventListener('click',      _fsGesture);
+        document.removeEventListener('touchstart', _fsGesture);
+        document.removeEventListener('keydown',    _fsGesture);
+    }
+    document.addEventListener('click',      _fsGesture);
+    document.addEventListener('touchstart', _fsGesture);
+    document.addEventListener('keydown',    _fsGesture);
+
+    // Tentativa 3: volta ao fullscreen se o usuário sair sem querer
+    document.addEventListener('fullscreenchange', function() {
+        if (!document.fullscreenElement) {
+            setTimeout(function() { try { goFullscreen(); } catch(e) {} }, 2000);
+        }
+    });
 </script>
 </body>
 </html>
