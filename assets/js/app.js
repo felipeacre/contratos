@@ -77,7 +77,7 @@ function initTvClock() {
 
     function tick() {
         const now = new Date();
-        el.textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        el.textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'America/Rio_Branco' });
     }
     tick();
     setInterval(tick, 1000);
