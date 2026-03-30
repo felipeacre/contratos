@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Banner exibido no launcher da Android TV.
+    Dimensão recomendada: 320 x 180 dp.
+    Este drawable vetorial substitui uma imagem PNG e funciona em qualquer densidade.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Fundo azul IDAF -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#1A237E" />
+        </shape>
+    </item>
+
+    <!-- Faixa inferior de destaque -->
+    <item android:top="140dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#1565C0" />
+        </shape>
+    </item>
+
+    <!-- Texto principal -->
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:tint="#FFFFFF"
+            android:src="@drawable/ic_launcher" />
+    </item>
+
+</layer-list>

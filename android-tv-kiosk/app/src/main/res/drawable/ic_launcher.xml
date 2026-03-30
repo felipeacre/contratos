@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Ícone do aplicativo — vetor simples com as iniciais IDAF.
+    viewportWidth/Height: 108x108 (padrão adaptive icon).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Fundo -->
+    <path
+        android:fillColor="#1A237E"
+        android:pathData="M0,0 h108 v108 h-108 z" />
+
+    <!-- Círculo de destaque -->
+    <path
+        android:fillColor="#1565C0"
+        android:pathData="M54,54 m-38,0 a38,38 0 1,0 76,0 a38,38 0 1,0 -76,0" />
+
+    <!-- Letra I -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M26,36 h8 v36 h-8 z" />
+
+    <!-- Letra D -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,36 h10 c10,0 16,6 16,18 c0,12 -6,18 -16,18 h-10 z
+                          M46,44 v20 c4,0 10,-2 10,-10 c0,-8 -6,-10 -10,-10 z" />
+
+    <!-- Letra A -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M68,72 l10,-36 l10,36 h-8 l-2,-8 h-8 l-2,8 z
+                          M72,57 h8 l-4,-14 z" />
+
+    <!-- Letra F — apenas a inicial para não sobrecarregar o ícone -->
+    <!-- (já comunicado com as letras acima: IDAF) -->
+
+</vector>
