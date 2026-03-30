@@ -97,13 +97,36 @@ if ($json_mode) {
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1920">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title><?= APP_NAME ?> — Painel TV</title>
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/app.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { height: 100%; overflow: hidden; }
+        html { height: 100%; }
+        body {
+            height: 100%;
+            overflow: hidden;
+            /* zoom aplicado via JS abaixo para escalar 1920px em qualquer TV */
+            transform-origin: top left;
+        }
     </style>
+    <script>
+        /* Escala o layout proporcionalmente ao viewport real da TV.
+           O CSS foi desenhado para 1920px de largura.
+           Em Android TV (DPR=2) o viewport real costuma ser 960px —
+           este script aplica zoom para que 1920 CSS px caibam na tela. */
+        (function () {
+            var BASE_W = 1920;
+            function applyScale() {
+                var scale = window.innerWidth / BASE_W;
+                document.body.style.transform = 'scale(' + scale + ')';
+                document.body.style.width      = BASE_W + 'px';
+                document.body.style.height     = (window.innerHeight / scale) + 'px';
+            }
+            document.addEventListener('DOMContentLoaded', applyScale);
+            window.addEventListener('resize', applyScale);
+        })();
+    </script>
 </head>
 <body class="tv-mode">
 
