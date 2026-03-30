@@ -141,98 +141,66 @@ function initTvScroll(tbodyId, pixelsPerSecond) {
     };
 }
 
-function initTvCarousel(scrollId, intervalMs) {
-    var scroll = document.getElementById(scrollId);
-    if (!scroll) return null;
+/* ── Escalator: rola os cards de forma contínua como uma esteira ── */
+function initTvEscalator(id, pixelsPerSecond) {
+    var el  = document.getElementById(id);
+    if (!el) return function() {};
 
-    var body    = scroll.parentElement; // .tv-section-body
-    var itv     = intervalMs || 8000;
-    var perPage = 0;   // calculado na 1ª build (elementos visíveis)
-    var timer   = null;
-    var advance = null;
+    var pps         = pixelsPerSecond || 60;
+    var originalHtml = el.innerHTML;   // conteúdo original (um conjunto)
+    var pos         = 0;
+    var halfH       = 0;
+    var lastTime    = null;
+    var rafId       = null;
+    var running     = false;
 
-    function pauseCarousel() { clearInterval(timer); }
-    function resumeCarousel() { if (advance) timer = setInterval(advance, itv); }
+    function start() {
+        cancelAnimationFrame(rafId);
+        running  = false;
+        pos      = 0;
+        lastTime = null;
 
-    function build() {
-        clearInterval(timer);
-        advance = null;
+        // Duplica o conteúdo para o loop ser contínuo sem salto
+        el.innerHTML = originalHtml + originalHtml;
+        el.style.transform = 'translateY(0)';
 
-        // Remove carrossel anterior
-        var old = body.querySelector('.tv-carousel-wrap');
-        if (old) {
-            old.removeEventListener('mouseenter', pauseCarousel);
-            old.removeEventListener('mouseleave', resumeCarousel);
-            old.remove();
-        }
+        // Aguarda layout renderizar para medir alturas reais
+        requestAnimationFrame(function() {
+            var container = el.parentElement;
+            if (!container) return;
+            halfH = el.scrollHeight / 2;   // altura de UM conjunto
 
-        // Itens fixos por página
-        if (!perPage) {
-            perPage = 6;
-        }
-
-        var cards = Array.from(scroll.querySelectorAll('.tv-card'));
-
-        // Se couber tudo numa página, exibe direto sem carrossel
-        if (!cards.length || cards.length <= perPage) {
-            scroll.style.display = '';
-            return;
-        }
-        scroll.style.display = 'none';
-
-        // Divide em páginas
-        var chunks = [];
-        for (var i = 0; i < cards.length; i += perPage) {
-            chunks.push(cards.slice(i, i + perPage));
-        }
-        var total = chunks.length;
-
-        // Monta DOM do carrossel
-        var wrap  = document.createElement('div');
-        wrap.className = 'tv-carousel-wrap';
-
-        var track = document.createElement('div');
-        track.className = 'tv-carousel-track';
-
-        chunks.forEach(function(chunk) {
-            var page = document.createElement('div');
-            page.className = 'tv-carousel-page';
-            chunk.forEach(function(card) { page.appendChild(card.cloneNode(true)); });
-            track.appendChild(page);
+            // Só anima se a lista for maior que a área visível
+            if (halfH > container.clientHeight + 10) {
+                running = true;
+                rafId   = requestAnimationFrame(step);
+            }
         });
-
-        var ind = document.createElement('div');
-        ind.className = 'tv-page-indicator';
-
-        wrap.appendChild(track);
-        wrap.appendChild(ind);
-        body.appendChild(wrap);
-
-        var cur = 0;
-
-        function goTo(i) {
-            cur = ((i % total) + total) % total;
-            track.style.transform = 'translateX(-' + (cur * 100) + '%)';
-            ind.textContent = (cur + 1) + ' / ' + total;
-        }
-        goTo(0);
-
-        advance = function() { goTo(cur + 1); };
-        timer   = setInterval(advance, itv);
-
-        wrap.addEventListener('mouseenter', pauseCarousel);
-        wrap.addEventListener('mouseleave', resumeCarousel);
     }
 
-    // 1ª build: aguarda layout estabilizar (scroll ainda visível)
-    setTimeout(function() {
-        build();
-        // Se só 1 página, scroll fica visível — oculta o div fonte
-        if (scroll.style.display !== '') scroll.style.display = 'none';
-    }, 150);
+    function step(ts) {
+        if (!running) return;
+        if (!lastTime) lastTime = ts;
 
-    // Retorna função de reset (chamada após refresh de dados)
-    return function() { build(); };
+        var dt = (ts - lastTime) / 1000;
+        if (dt > 0.1) dt = 0.1;   // evita salto após aba ficar em background
+        lastTime = ts;
+
+        pos += pps * dt;
+        if (halfH && pos >= halfH) pos -= halfH;   // loop sem salto visual
+
+        el.style.transform = 'translateY(-' + pos.toFixed(1) + 'px)';
+        rafId = requestAnimationFrame(step);
+    }
+
+    // Inicia após layout estabilizar
+    setTimeout(start, 200);
+
+    // Retorna reset: aceita HTML novo (chamado no refresh de dados)
+    return function(newHtml) {
+        if (newHtml !== undefined) originalHtml = newHtml;
+        start();
+    };
 }
 
 function initTvRefresh(intervalSeconds) {
@@ -287,29 +255,22 @@ function updateTvData(data) {
             : '<div class="tv-empty-msg">' + emptyMsg + '</div>';
     }
 
-    // ── 1. Atualiza divs-fonte (ocultos) com novos dados ──
+    // ── Atualiza escalators com novos dados ──
     if (data.contratos) {
         var criticos  = data.contratos.filter(function(c){ return parseInt(c.dias_para_vencer) <= 30; });
         var atencao   = data.contratos.filter(function(c){ var d=parseInt(c.dias_para_vencer); return d>30&&d<=90; });
         var tranquilo = data.contratos.filter(function(c){ return parseInt(c.dias_para_vencer) > 90; });
 
-        var sC = document.getElementById('tv-scroll-criticos');
-        if (sC) sC.innerHTML = renderCards(criticos, '&#10003; Nenhum crítico');
-        var sA = document.getElementById('tv-scroll-atencao');
-        if (sA) sA.innerHTML = renderCards(atencao, '&#10003; Nenhum');
-        var sT = document.getElementById('tv-scroll-tranquilo');
-        if (sT) sT.innerHTML = renderCards(tranquilo, '&#10003; Nenhum');
-
         var eC = document.getElementById('tv-count-criticos');  if (eC) eC.textContent = criticos.length;
         var eA = document.getElementById('tv-count-atencao');   if (eA) eA.textContent = atencao.length;
         var eT = document.getElementById('tv-count-tranquilo'); if (eT) eT.textContent = tranquilo.length;
-    }
 
-    // ── 2. Reconstrói carrosséis com dados novos ──
-    if (typeof scrollReset !== 'undefined') {
-        ['criticos', 'atencao', 'tranquilo'].forEach(function(k) {
-            if (scrollReset[k]) scrollReset[k]();
-        });
+        // Passa HTML novo para o escalator — ele re-duplica e reinicia suave
+        if (typeof scrollReset !== 'undefined') {
+            if (scrollReset['criticos'])  scrollReset['criticos'](renderCards(criticos,  '&#10003; Nenhum crítico'));
+            if (scrollReset['atencao'])   scrollReset['atencao'](renderCards(atencao,    '&#10003; Nenhum'));
+            if (scrollReset['tranquilo']) scrollReset['tranquilo'](renderCards(tranquilo,'&#10003; Nenhum'));
+        }
     }
 }
 

@@ -239,9 +239,10 @@ if ($json_mode) {
     initTvClock();
 
     var scrollReset = {};
-    scrollReset['criticos']  = initTvCarousel('tv-scroll-criticos',  5000);
-    scrollReset['atencao']   = initTvCarousel('tv-scroll-atencao',   5000);
-    scrollReset['tranquilo'] = initTvCarousel('tv-scroll-tranquilo', 8000);
+    // Velocidade em pixels/segundo — aumente para rolar mais rápido
+    scrollReset['criticos']  = initTvEscalator('tv-scroll-criticos',  55);
+    scrollReset['atencao']   = initTvEscalator('tv-scroll-atencao',   50);
+    scrollReset['tranquilo'] = initTvEscalator('tv-scroll-tranquilo', 45);
 
     initTvRefresh(60);
 
