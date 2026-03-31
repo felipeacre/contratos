@@ -56,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $db->prepare("INSERT INTO licitacoes ($cols) VALUES ($vals)")->execute($data);
             flash('success', 'Licitação cadastrada com sucesso.');
         }
+        tv_signal_update();
         redirect(BASE_URL . '/modules/licitacoes/index.php');
     }
     $licitacao = array_merge($licitacao, $f);

@@ -35,6 +35,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($f['data_inicio']))    $errors[] = 'Data de início é obrigatória.';
     if (empty($f['data_vencimento']))$errors[] = 'Data de vencimento é obrigatória.';
     if (!is_numeric(str_replace(',','.',$f['valor_total'] ?? ''))) $errors[] = 'Valor total inválido.';
+    if (empty($f['fornecedor_id']) && empty(trim($f['fornecedor_nome'] ?? '')))
+        $errors[] = 'Informe o fornecedor (cadastrado ou razão social manual).';
+
+    // Validações cruzadas de datas
+    if (empty($errors) || !array_filter($errors, fn($e) => str_contains($e, 'Data'))) {
+        $dt_ass  = $f['data_assinatura']  ? strtotime($f['data_assinatura'])  : null;
+        $dt_ini  = $f['data_inicio']      ? strtotime($f['data_inicio'])      : null;
+        $dt_venc = $f['data_vencimento']  ? strtotime($f['data_vencimento'])  : null;
+        if ($dt_ini && $dt_ass && $dt_ini < $dt_ass)
+            $errors[] = 'Data de início não pode ser anterior à data de assinatura.';
+        if ($dt_venc && $dt_ini && $dt_venc <= $dt_ini)
+            $errors[] = 'Data de vencimento deve ser posterior à data de início.';
+    }
 
     if (empty($errors)) {
         $valor_total  = (float) str_replace(',', '.', $f['valor_total']);
@@ -50,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'fornecedor_nome'     => trim($f['fornecedor_nome'] ?? ''),
             'fornecedor_cnpj'     => preg_replace('/\D/', '', $f['fornecedor_cnpj'] ?? ''),
             'objeto'              => trim($f['objeto']),
-            'modalidade'          => $f['modalidade'] ?? null,
+            'modalidade'          => ($f['modalidade'] ?? '') ?: null,  // '' → null (ENUM não aceita string vazia)
             'valor_total'         => $valor_total,
             'saldo_atual'         => $saldo_atual,
             'data_assinatura'     => $f['data_assinatura'],
@@ -79,6 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute($data);
             flash('success', 'Contrato cadastrado com sucesso.');
         }
+        tv_signal_update();
         redirect(BASE_URL . '/modules/contratos/index.php');
     }
     // Repopula campos com o que foi enviado

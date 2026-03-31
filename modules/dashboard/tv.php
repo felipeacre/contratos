@@ -244,7 +244,8 @@ if ($json_mode) {
     scrollReset['atencao']   = initTvEscalator('tv-scroll-atencao',   30);
     scrollReset['tranquilo'] = initTvEscalator('tv-scroll-tranquilo', 25);
 
-    initTvRefresh(60);
+    initTvRefresh(60);   // fallback: polling a cada 60s
+    initTvSSE('<?= BASE_URL ?>/modules/dashboard/tv-events.php');
 
     // ── Tela cheia automática ──────────────────────────────────────
     // Android TV pode bloquear requestFullscreen sem gesto do usuário.

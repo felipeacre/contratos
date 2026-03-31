@@ -203,6 +203,34 @@ function initTvEscalator(id, pixelsPerSecond) {
     };
 }
 
+/* ── SSE: atualização em tempo real quando contrato é salvo ── */
+function initTvSSE(url) {
+    var lastTs = 0;
+
+    function connect() {
+        var es = new EventSource(url + '?since=' + lastTs);
+
+        es.onmessage = function(e) {
+            var data = JSON.parse(e.data);
+            if (data.ts) lastTs = data.ts;
+            if (data.update) {
+                fetch(window.location.pathname + window.location.search.replace(/([?&])json=1/, '') + (window.location.search ? '&' : '?') + 'json=1')
+                    .then(function(r) { return r.json(); })
+                    .then(updateTvData)
+                    .catch(function() {});
+            }
+        };
+
+        es.onerror = function() {
+            es.close();
+            setTimeout(connect, 5000);   // tenta reconectar após 5s
+        };
+    }
+
+    // Só conecta se o browser suporta SSE (todos os modernos suportam)
+    if (typeof EventSource !== 'undefined') connect();
+}
+
 function initTvRefresh(intervalSeconds) {
     const indicator = document.getElementById('tv-refresh-indicator');
 

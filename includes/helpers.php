@@ -93,3 +93,9 @@ function cnpj_format(string $cnpj): string {
     if (strlen($cnpj) !== 14) return $cnpj;
     return substr($cnpj,0,2).'.'.substr($cnpj,2,3).'.'.substr($cnpj,5,3).'/'.substr($cnpj,8,4).'-'.substr($cnpj,12,2);
 }
+
+// Sinaliza a TV para atualizar os dados (usado após salvar contrato/licitação)
+function tv_signal_update(): void {
+    $f = BASE_PATH . '/uploads/tv_last_update.txt';
+    @file_put_contents($f, (string) time());
+}
