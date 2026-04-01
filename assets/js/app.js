@@ -174,6 +174,10 @@ function initTvEscalator(id, pixelsPerSecond) {
             if (halfH > container.clientHeight + 10) {
                 running = true;
                 rafId   = requestAnimationFrame(step);
+            } else {
+                // Cabe tudo na tela — remove a duplicação para não mostrar itens repetidos
+                el.innerHTML = originalHtml;
+                halfH = 0;
             }
         });
     }
