@@ -244,7 +244,7 @@ if ($json_mode) {
     scrollReset['atencao']   = initTvEscalator('tv-scroll-atencao',   30);
     scrollReset['tranquilo'] = initTvEscalator('tv-scroll-tranquilo', 25);
 
-    initTvRefresh(60);   // fallback: polling a cada 60s
+    initTvRefresh(15);   // polling a cada 15s (garante atualização mesmo sem SSE)
     initTvSSE('<?= BASE_URL ?>/modules/dashboard/tv-events.php');
 
     // ── Tela cheia automática ──────────────────────────────────────
