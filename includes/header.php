@@ -48,7 +48,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= BASE_URL ?>/modules/controles">
+                    <a class="nav-link" href="<?= BASE_URL ?>/modules/controles/index.php">
                         <i class="bi bi-controller"></i> Controles
                     </a>
                 </li>

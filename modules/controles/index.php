@@ -4,9 +4,9 @@ Auth::require_login();
 
 $db = Database::get();
 $stmt = $db->prepare('SELECT * FROM controles');
-$controle = $db->query('SELECT * FROM controles')->fetch();
-$modal = explode('_', $controle['modal']);
-$ultimoPesquisado = empty($controle['modal']) ? 'Ex. 19/2024':'Último: ' . str_replace('-', '/', $modal[1]);
+$controle = $db->query('SELECT * FROM controles')->fetch() ?: [];
+$modal = explode('_', $controle['modal'] ?? '');
+$ultimoPesquisado = empty($controle['modal']) ? 'Ex. 19/2024' : 'Último: ' . str_replace('-', '/', $modal[1] ?? '');
 // SALVAR
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $f = $_POST;
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
        die($th->getMessage());
     }
     
-    redirect(BASE_URL . '/modules/controles');
+    redirect(BASE_URL . '/modules/controles/index.php');
 }
 
 include __DIR__ . '/../../includes/header.php';
