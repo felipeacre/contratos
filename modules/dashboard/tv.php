@@ -8,9 +8,9 @@ $db = Database::get();
 $json_mode = !empty($_GET['json']);
 
 // Resumo
-$resumo = $db->query('SELECT * FROM vw_dashboard_resumo')->fetch();
-$controles = $db->query('SELECT * FROM controles')->fetch();
-$resumoLicitacoes = $db->query('SELECT * FROM vw_resumo_licitacao')->fetch();
+$resumo = $db->query('SELECT * FROM vw_dashboard_resumo')->fetch() ?: [];
+$controles = $db->query('SELECT * FROM controles')->fetch() ?: [];
+$resumoLicitacoes = $db->query('SELECT * FROM vw_resumo_licitacao')->fetch() ?: [];
 // print_r(json_encode($controles));exit;
 
 // Todos os contratos ativos

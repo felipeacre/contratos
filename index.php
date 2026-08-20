@@ -5,7 +5,7 @@ Auth::require_login();
 $db = Database::get();
 
 // Resumo
-$resumo = $db->query('SELECT * FROM vw_dashboard_resumo')->fetch();
+$resumo = $db->query('SELECT * FROM vw_dashboard_resumo')->fetch() ?: [];
 
 // Contratos críticos (vencidos + críticos + atenção)
 $criticos = $db->query("
