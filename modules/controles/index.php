@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../includes/bootstrap.php';
 Auth::require_login();
 
 $db = Database::get();
-$controle = $db->query('SELECT * FROM controles WHERE user_id = 1')->fetch() ?: [];
+$controle = $db->query('SELECT * FROM controles WHERE user_id = 1 ORDER BY id DESC LIMIT 1')->fetch() ?: [];
 $modal = explode('_', $controle['modal'] ?? '');
 $ultimoPesquisado = empty($controle['modal']) ? 'Ex. 19/2024' : 'Último: ' . str_replace('-', '/', $modal[1] ?? '');
 
@@ -46,8 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 velocidade_licitacao_deserta    = VALUES(velocidade_licitacao_deserta),
                 transicao                       = VALUES(transicao)
         ")->execute($data);
+        flash('success', 'Controles salvos.');
     } catch (\Throwable $th) {
-        die($th->getMessage());
+        flash('danger', 'Erro ao salvar: ' . $th->getMessage());
     }
 
     redirect(BASE_URL . '/modules/controles/index.php');
@@ -88,38 +89,38 @@ include __DIR__ . '/../../includes/header.php';
         <div class="row mt-3">
             <div class="col-12 mb-3">
                 <label class="form-label fw-semibold">Velocidade (transição)</label>
-                <input type="number" name="transicao" class="form-control" value="<?= $controle['transicao'] ?>">
+                <input type="number" name="transicao" class="form-control" value="<?= $controle['transicao'] ?? 60 ?>">
             </div>
             <div class="col-md-4">
                 <label class="form-label fw-semibold">Contrato (tranquilo)</label>
-                <input type="number" name="velocidade_contrato_tranquilo" class="form-control" value="<?= $controle['velocidade_contrato_tranquilo'] ?>">
+                <input type="number" name="velocidade_contrato_tranquilo" class="form-control" value="<?= $controle['velocidade_contrato_tranquilo'] ?? 30 ?>">
             </div>
             
             <div class="col-md-4">
                 <label class="form-label fw-semibold">Contrato (atenção)</label>
-                <input type="number" name="velocidade_contrato_atencao" class="form-control" value="<?= $controle['velocidade_contrato_atencao'] ?>">
+                <input type="number" name="velocidade_contrato_atencao" class="form-control" value="<?= $controle['velocidade_contrato_atencao'] ?? 30 ?>">
             </div>
             
             <div class="col-md-4">
                 <label class="form-label fw-semibold">Contrato (críticos)</label>
-                <input type="number" name="velocidade_contrato_critico" class="form-control" value="<?= $controle['velocidade_contrato_critico'] ?>">
+                <input type="number" name="velocidade_contrato_critico" class="form-control" value="<?= $controle['velocidade_contrato_critico'] ?? 30 ?>">
             </div>
         </div>        
         
         <div class="row mt-3">
             <div class="col-md-4">
                 <label class="form-label fw-semibold">Licitação (fracassada / deserta)</label>
-                <input type="number" name="velocidade_licitacao_deserta" class="form-control" value="<?= $controle['velocidade_licitacao_deserta'] ?>">
+                <input type="number" name="velocidade_licitacao_deserta" class="form-control" value="<?= $controle['velocidade_licitacao_deserta'] ?? 30 ?>">
             </div>
             
             <div class="col-md-4">
                 <label class="form-label fw-semibold">Licitação (em andamento)</label>
-                <input type="number" name="velocidade_licitacao_andamento" class="form-control" value="<?= $controle['velocidade_licitacao_andamento'] ?>">
+                <input type="number" name="velocidade_licitacao_andamento" class="form-control" value="<?= $controle['velocidade_licitacao_andamento'] ?? 30 ?>">
             </div>
             
             <div class="col-md-4">
                 <label class="form-label fw-semibold">Licitação (homologada)</label>
-                <input type="number" name="velocidade_licitacao_homologada" class="form-control" value="<?= $controle['velocidade_licitacao_homologada'] ?>">
+                <input type="number" name="velocidade_licitacao_homologada" class="form-control" value="<?= $controle['velocidade_licitacao_homologada'] ?? 30 ?>">
             </div>
         </div>        
 

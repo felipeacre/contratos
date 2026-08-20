@@ -172,6 +172,27 @@ CREATE TABLE importacoes_log (
 ) ENGINE=InnoDB;
 
 -- ------------------------------------------------------------
+-- CONTROLES DO PAINEL TV
+-- Uma linha por usuário. A UNIQUE em user_id é OBRIGATÓRIA:
+-- o módulo grava com INSERT ... ON DUPLICATE KEY UPDATE.
+-- Sem ela, cada save insere linha nova e nada parece salvar.
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS controles (
+    id                              INT AUTO_INCREMENT PRIMARY KEY,
+    user_id                         INT NOT NULL,
+    modal                           VARCHAR(20) DEFAULT NULL,
+    velocidade_contrato_tranquilo   INT NOT NULL DEFAULT 30,
+    velocidade_contrato_atencao     INT NOT NULL DEFAULT 30,
+    velocidade_contrato_critico     INT NOT NULL DEFAULT 30,
+    velocidade_licitacao_deserta    INT NOT NULL DEFAULT 30,
+    velocidade_licitacao_andamento  INT NOT NULL DEFAULT 30,
+    velocidade_licitacao_homologada INT NOT NULL DEFAULT 30,
+    transicao                       INT NOT NULL DEFAULT 60,
+    created_at                      TIMESTAMP NULL DEFAULT NULL,
+    UNIQUE KEY uk_controles_user (user_id)
+) ENGINE=InnoDB;
+
+-- ------------------------------------------------------------
 -- VIEWS ÚTEIS
 -- ------------------------------------------------------------
 

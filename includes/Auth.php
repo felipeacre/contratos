@@ -11,9 +11,12 @@ class Auth {
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
-        // if (!$user || !$user['ativo'] || !password_verify($senha, $user['senha_hash'])) {
-        //     return false;
-        // }
+        if (!$user || !$user['ativo'] || !password_verify($senha, $user['senha_hash'])) {
+            return false;
+        }
+
+        // Evita fixação de sessão: novo ID após autenticar
+        session_regenerate_id(true);
 
         $_SESSION['usuario_id']   = $user['id'];
         $_SESSION['usuario_nome'] = $user['nome'];
