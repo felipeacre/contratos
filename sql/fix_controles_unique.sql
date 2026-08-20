@@ -22,8 +22,21 @@ INNER JOIN `controles` c2
 ALTER TABLE `controles`
     MODIFY `user_id` INT NOT NULL;
 
-ALTER TABLE `controles`
-    ADD UNIQUE KEY `uk_controles_user` (`user_id`);
+-- Idempotente: o MySQL 8.0 não tem "ADD UNIQUE KEY IF NOT EXISTS",
+-- então só emite o ALTER se o índice ainda não existir.
+SET @ja_existe := (
+    SELECT COUNT(*) FROM information_schema.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME   = 'controles'
+      AND INDEX_NAME   = 'uk_controles_user'
+);
+SET @sql := IF(@ja_existe > 0,
+    'SELECT ''uk_controles_user já existe — nada a fazer'' AS aviso',
+    'ALTER TABLE `controles` ADD UNIQUE KEY `uk_controles_user` (`user_id`)'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- 4) Conferência
 SELECT * FROM `controles`;
