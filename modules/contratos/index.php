@@ -118,6 +118,15 @@ include __DIR__ . '/../../includes/header.php';
                             <i class="bi bi-trash"></i>
                         </a>
                         <?php endif; ?>
+                        <?php if (!empty($c['active'])): ?>
+                        <a href="active.php?id=<?= (int)$c['id'] ?>&active=0" class="btn btn-sm btn-outline-success" title="Ocultar">
+                            <i class="bi bi-toggle-on"></i>
+                        </a>
+                        <?php else: ?>
+                        <a href="active.php?id=<?= (int)$c['id'] ?>&active=1" class="btn btn-sm btn-outline-secondary" title="Mostrar">
+                            <i class="bi bi-toggle-off"></i>
+                        </a>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>

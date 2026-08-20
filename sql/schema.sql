@@ -199,7 +199,7 @@ LEFT JOIN fornecedores f ON f.id = c.fornecedor_id;
 CREATE OR REPLACE VIEW vw_dashboard_resumo AS
 SELECT
     COUNT(*) AS total_contratos,
-    SUM(CASE WHEN data_vencimento < CURDATE() AND status_manual IS NULL THEN 1 ELSE 0 END) AS vencidos,
+    SUM(CASE WHEN data_vencimento < CURDATE() AND status_manual IS NULL  THEN 1 ELSE 0 END) AS vencidos,
     SUM(CASE WHEN DATEDIFF(data_vencimento, CURDATE()) BETWEEN 0 AND 30  AND status_manual IS NULL THEN 1 ELSE 0 END) AS criticos,
     SUM(CASE WHEN DATEDIFF(data_vencimento, CURDATE()) BETWEEN 31 AND 90 AND status_manual IS NULL THEN 1 ELSE 0 END) AS atencao,
     SUM(CASE WHEN DATEDIFF(data_vencimento, CURDATE()) BETWEEN 91 AND 180 AND status_manual IS NULL THEN 1 ELSE 0 END) AS alerta,

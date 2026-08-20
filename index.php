@@ -13,7 +13,7 @@ $criticos = $db->query("
            dias_para_vencer, status_vencimento, valor_total, saldo_atual
     FROM vw_contratos
     WHERE status_vencimento IN ('vencido','critico','atencao')
-      AND (status_manual IS NULL OR status_manual = 'ativo')
+      AND ((status_manual IS NULL OR status_manual = 'ativo') AND active = 1)
     ORDER BY dias_para_vencer ASC
     LIMIT 20
 ")->fetchAll();
@@ -34,7 +34,7 @@ $por_mes = $db->query("
            COUNT(*) AS total
     FROM contratos
     WHERE data_vencimento BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 12 MONTH)
-      AND (status_manual IS NULL OR status_manual = 'ativo')
+      AND ((status_manual IS NULL OR status_manual = 'ativo') AND active = 1)
     GROUP BY DATE_FORMAT(data_vencimento,'%Y-%m'), DATE_FORMAT(data_vencimento,'%b/%Y')
     ORDER BY DATE_FORMAT(data_vencimento,'%Y-%m')
 ")->fetchAll();
@@ -48,13 +48,13 @@ include __DIR__ . '/includes/header.php';
     <!-- Cards de status -->
     <div class="col-6 col-sm-4 col-lg-2">
         <div class="card card-status card-vencido h-100 p-3">
-            <div class="text-danger display-4 fw-bold"><?= $resumo['vencidos'] ?? 0 ?></div>
+            <div class="text-danger display-4 fw-bold"><?= $resumo['vencido'] ?? 0 ?></div>
             <div class="text-muted small mt-1"><i class="bi bi-exclamation-circle-fill text-danger"></i> Vencidos</div>
         </div>
     </div>
     <div class="col-6 col-sm-4 col-lg-2">
         <div class="card card-status card-critico h-100 p-3">
-            <div class="text-warning display-4 fw-bold"><?= $resumo['criticos'] ?? 0 ?></div>
+            <div class="text-warning display-4 fw-bold"><?= $resumo['critico'] ?? 0 ?></div>
             <div class="text-muted small mt-1"><i class="bi bi-exclamation-triangle-fill text-warning"></i> Críticos (30d)</div>
         </div>
     </div>
@@ -72,7 +72,7 @@ include __DIR__ . '/includes/header.php';
     </div>
     <div class="col-6 col-sm-4 col-lg-2">
         <div class="card card-status card-regular h-100 p-3">
-            <div class="text-success display-4 fw-bold"><?= $resumo['regulares'] ?? 0 ?></div>
+            <div class="text-success display-4 fw-bold"><?= $resumo['regular'] ?? 0 ?></div>
             <div class="text-muted small mt-1"><i class="bi bi-check-circle-fill text-success"></i> Regulares</div>
         </div>
     </div>

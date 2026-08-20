@@ -9,7 +9,7 @@
     --status-vencido:  #dc3545;
     --status-critico:  #fd7e14;
     --status-atencao:  #ffc107;
-    --status-alerta:   #0dcaf0;
+    --status-alerta:   #33ccff;
     --status-regular:  #198754;
 }
 
@@ -87,9 +87,6 @@ body.tv-mode {
     align-items: center;
     flex-shrink: 0;
 }
-.tv-header-logo {
-    /* alinhado à esquerda, já padrão */
-}
 .tv-header-clock {
     display: flex;
     justify-content: center;
@@ -139,6 +136,41 @@ body.tv-mode {
     padding: 8px 40px;
     flex-shrink: 0;
 }
+.tv-cards-licitacao-1col {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 8px;
+    padding: 8px 40px;
+    flex-shrink: 0;
+    background-color: #030F08;
+}
+.tv-cards-licitacao-2col {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 8px 40px;
+    flex-shrink: 0;
+    background-color: #030F08;
+    width: 100%;
+}
+.tv-cards-licitacao-3col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 8px 40px;
+    flex-shrink: 0;
+    background-color: #030F08;
+    width: 100%;
+}
+.tv-cards-licitacao-4col {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 8px 40px;
+    flex-shrink: 0;
+    background-color: #030F08;
+    width: 100%;
+}
 .tv-stat {
     border-radius: 8px;
     padding: 16px 24px;
@@ -147,8 +179,23 @@ body.tv-mode {
     gap: 20px;
     overflow: hidden;
 }
+.tv-stat-licitacao {
+    border-radius: 8px;
+    padding: 16px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+}
 .tv-stat .num {
     font-size: 7rem;
+    font-weight: 900;
+    line-height: 1;
+    flex-shrink: 0;
+    color: #fff;
+}
+.tv-stat-licitacao .num {
+    font-size: 6rem;
     font-weight: 900;
     line-height: 1;
     flex-shrink: 0;
@@ -166,22 +213,44 @@ body.tv-mode {
 .tv-stat.s-vencido { background: #1e050a; border: 2px solid #7a1522; }
 .tv-stat.s-critico { background: #1e0e00; border: 2px solid #7a3c00; }
 .tv-stat.s-atencao { background: #191400; border: 2px solid #7a6200; }
-.tv-stat.s-alerta  { background: #001520; border: 2px solid #006080; }
+.tv-stat.s-alerta  { background: #001520; border: 2px solid #33ccee; }
 .tv-stat.s-regular { background: #030f08; border: 2px solid #0d5c28; }
 .tv-stat.s-vencido .num { color: #ff5566; }
 .tv-stat.s-critico .num { color: #ff9933; }
 .tv-stat.s-atencao .num { color: #ffcc00; }
-.tv-stat.s-alerta  .num { color: #33ccee; }
+.tv-stat.s-alerta  .num  { color: #33ccee; }
 .tv-stat.s-regular .num { color: #44dd88; }
 
 /* ── ÁREA PRINCIPAL: 4 colunas ──────────────────────────── */
-.tv-main {
+.tv-main-3col {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 10px;
     padding: 8px 40px 10px;
     flex: 1;
     min-height: 0;
+    width: 100%;
+    background: #07090f;
+}
+.tv-main-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 8px 40px 10px;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    background: #07090f;
+}
+.tv-main-1col {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 8px 40px 10px;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    background: #07090f;
 }
 
 /* ── SEÇÃO (coluna) ──────────────────────────────────────── */
@@ -210,9 +279,9 @@ body.tv-mode {
     line-height: 1;
 }
 .tv-section-header.sh-criticos  { background: #1e0710; color: #ff5566; border-bottom: 3px solid #aa1122; }
-.tv-section-header.sh-atencao   { background: #141000; color: #ffcc00; border-bottom: 3px solid #aa8800; }
-.tv-section-header.sh-tranquilo { background: #030f08; color: #44dd88; border-bottom: 3px solid #0d7040; }
-.tv-section-header.sh-licitacoes{ background: #001520; color: #33ccee; border-bottom: 3px solid #006080; }
+.tv-section-header.sh-atencao   { background: #141000; color: #ffcc00; border-bottom: 3px solid #ffcc00; }
+.tv-section-header.sh-tranquilo { background: #030f08; color: #44dd88; border-bottom: 3px solid #084d20;}
+.tv-section-header.sh-alerta{ background: #001520; color: #33ccee; border-bottom: 3px solid #006080; }
 
 .tv-section-body {
     flex: 1;
@@ -237,13 +306,29 @@ body.tv-mode {
     overflow: hidden;
     background: #111928;
 }
+.tv-card-licitacao {
+    align-items: stretch;
+    min-height: 105px;
+    border-radius: 7px;
+    overflow: hidden;
+    background: #111928;
+    margin: 2px 0 2px;
+}
 
 /* Borda lateral colorida por urgência */
-.tv-card.bc-vencido  { border-left: 7px solid #cc1122; }
-.tv-card.bc-urgente  { border-left: 7px solid #ff3300; }
-.tv-card.bc-critico  { border-left: 7px solid #cc6600; }
-.tv-card.bc-atencao  { border-left: 7px solid #cc9900; }
-.tv-card.bc-tranquilo{ border-left: 7px solid #0d7040; }
+.tv-card.bc-vencido, .tv-card-licitacao.bc-vencido  {border: 1px solid #cc1122; margin: 2px 0; }
+.tv-card.bc-urgente, .tv-card-licitacao.bc-urgente  { border: 1px solid #ff3300; margin: 2px 0;}
+.tv-card.bc-critico, .tv-card-licitacao.bc-critico  { border: 1px solid #cc6600; margin: 2px 0;}
+.tv-card.bc-atencao, .tv-card-licitacao.bc-atencao  { border: 1px solid #ffc107; margin: 2px 0;}
+.tv-card.bc-alerta, .tv-card-licitacao.bc-alerta  { border: 1px solid #0dcaf0; margin: 2px 0;}
+.tv-card.bc-tranquilo, .tv-card-licitacao.bc-tranquilo { border: 1px solid #084d20; margin: 2px 0;}
+
+.tv-card.bc-vencido {border-left: 7px solid #cc1122; margin: 2px 0; }
+.tv-card.bc-urgente {border-left: 7px solid #ff3300; margin: 2px 0;}
+.tv-card.bc-critico {border-left: 7px solid #cc6600; margin: 2px 0;}
+.tv-card.bc-atencao {border-left: 7px solid #ffc107; margin: 2px 0;}
+.tv-card.bc-alerta {border-left: 7px solid #0dcaf0; margin: 2px 0;}
+.tv-card.bc-tranquilo {border-left: 7px solid #084d20; margin: 2px 0;}
 
 /* Lado esquerdo: número + fornecedor */
 .tv-card-info {
@@ -253,6 +338,14 @@ body.tv-mode {
     flex-direction: column;
     justify-content: center;
     gap: 5px;
+    min-width: 0;
+}
+.tv-card-empresa {
+    font-size: 1.5rem;       /* ~24px */
+    color: #e8f0f8;
+    font-weight: 700;
+    text-align: center;
+    gap: 2px;
     min-width: 0;
 }
 .tv-card-num {
@@ -272,6 +365,26 @@ body.tv-mode {
     text-overflow: ellipsis;
     line-height: 1.15;
 }
+.tv-card-obj {
+    font-size: 1.5rem;      /* ~28px */
+    font-weight: 600;
+    /* color: #44DD88; */
+    margin: 12px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.15;
+}
+.tv-card-text-bottom {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.1rem;
+}
+
+.badge-unit-label {
+    color: #7a9abf;
+}
 
 /* Lado direito: badge do prazo (bloco sólido, altura total) */
 .tv-card-badge {
@@ -289,7 +402,17 @@ body.tv-mode {
     padding: 0 10px;
     text-align: center;
 }
-.tv-card-badge .badge-unit {
+.tv-card-badge-licitacao {
+    width: 100%;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #fff;
+    border-radius: 25px;
+    line-height: 1.5;
+    letter-spacing: 1px;
+    padding: 0 10px;
+}
+.tv-card-badge .badge-unit, .tv-card-badge-licitacao .badge-unit {
     font-size: .5em;
     font-weight: 700;
     letter-spacing: 3px;
@@ -302,8 +425,17 @@ body.tv-mode {
 .b-vencido  { background: #6b0a14; }
 .b-urgente  { background: #8b1a00; }
 .b-critico  { background: #6b3300; }
-.b-atencao  { background: #5a4400; }
+.b-atencao  { background: #ffc107; }
+.b-alerta  { background: #33ccff; }
 .b-tranquilo{ background: #084d20; }
+
+/* Cores sólidas dos textos */
+.vencido  { color: #ff5566; }
+.urgente  { color: #8b1a00; }
+.critico  { color: #6b3300; }
+.atencao  { color: #ffc107; }
+.alerta  { color: #33ccff; }
+.tranquilo{ color: #44DD88; }
 
 /* ── ANIMAÇÕES ───────────────────────────────────────────── */
 @keyframes pulse-urgente {
@@ -315,6 +447,74 @@ body.tv-mode {
     0%   { background: #6b0a14; }
     50%  { background: #bb1122; }
     100% { background: #6b0a14; }
+}
+
+#tv-section-scroll-critico {
+    animation: scrollInfinito var(--time-critico, 40s) linear infinite;
+}
+
+#tv-section-scroll-atencao {
+    animation: scrollInfinito var(--time-atencao, 40s) linear infinite;
+}
+
+#tv-section-scroll-tranquilo {
+    animation: scrollInfinito var(--time-tranquilo, 40s) linear infinite;
+}
+
+#tv-section-scroll-deserta {
+    animation: scrollInfinito var(--time-deserta) linear infinite;
+}
+
+#tv-section-scroll-andamento {
+    animation: scrollInfinito var(--time-andamento) linear infinite;
+}
+
+#tv-section-scroll-homologada {
+    animation: scrollInfinito var(--time-homologada) linear infinite;
+}
+
+.item-licitacao {
+  animation: showLicitacao var(--time-transition) ease-in-out infinite;
+  opacity: 0;
+}
+
+@keyframes showLicitacao {
+  /* 0% a 50% (0s a 60s): O elemento está com opacidade 0 (invisível), 
+     simulando o delay de 60 segundos */
+  0%, 50% { 
+    opacity: 0;
+    z-index: 0;
+  }
+  
+  /* 50.1% (60s): O elemento aparece instantaneamente */
+  50.1% { 
+    opacity: 1;
+    z-index: 10;
+  }
+  
+  /* 50.1% a 100% (60s a 120s): O elemento fica visível */
+  100% { 
+    opacity: 1;
+    z-index: 10;
+  }
+}
+
+@keyframes scrollInfinito {
+    from {
+        transform: translateY(calc(0));
+    }
+    to {
+        transform: translateY(calc(-50% + 3px));
+    }
+}
+
+@keyframes transicao {
+    from {
+        transform: translateY(calc(0));
+    }
+    to {
+        transform: translateY(calc(-50% + 3px));
+    }
 }
 
 .tv-card-badge.b-urgente { animation: pulse-urgente 1.3s ease-in-out infinite; }

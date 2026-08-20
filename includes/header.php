@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= isset($page_title) ? sanitize($page_title) . ' — ' : '' ?><?= APP_NAME ?></title>
     <!-- Bootstrap 5 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/bootstrap.min.css">
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/bootstrap-icons.min.css">
     <!-- DataTables -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/dataTables.bootstrap5.min.css">
     <!-- App CSS -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/app.css">
 </head>
@@ -45,6 +45,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="<?= BASE_URL ?>/modules/importacao/index.php">
                         <i class="bi bi-upload"></i> Importar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="<?= BASE_URL ?>/modules/controles">
+                        <i class="bi bi-controller"></i> Controles
                     </a>
                 </li>
                 <?php if (Auth::is_admin()): ?>

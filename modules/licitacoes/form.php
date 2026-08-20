@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($f['numero_processo'])) $errors[] = 'Número do processo é obrigatório.';
     if (empty($f['objeto']))          $errors[] = 'Objeto é obrigatório.';
+    if (empty($f['objeto_resumido'])) $errors[] = 'Objeto (texto resumido) é obrigatório.';
     if (empty($f['modalidade']))      $errors[] = 'Modalidade é obrigatória.';
 
     if (empty($errors)) {
@@ -30,6 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'numero_processo'        => trim($f['numero_processo']),
             'numero_licitacao'       => trim($f['numero_licitacao'] ?? ''),
             'objeto'                 => trim($f['objeto']),
+            'objeto_resumido'        => trim($f['objeto_resumido']),
+            'empresa_vencedora'      => trim($f['empresa_vencedora']),
             'modalidade'             => $f['modalidade'],
             'status'                 => $f['status'] ?? 'em_andamento',
             'valor_estimado'         => ($f['valor_estimado'] ?? '') !== ''
@@ -38,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'data_abertura'          => ($f['data_abertura'] ?? '') ?: null,
             'data_prevista_conclusao'=> ($f['data_prevista_conclusao'] ?? '') ?: null,
             'data_homologacao'       => ($f['data_homologacao'] ?? '') ?: null,
+            'data_sessao'            => ($f['data_sessao'] ?? '') ?: null,
             'responsavel'            => trim($f['responsavel'] ?? ''),
             'link_portal'            => trim($f['link_portal'] ?? ''),
             'observacoes'            => trim($f['observacoes'] ?? ''),
@@ -129,32 +133,42 @@ include __DIR__ . '/../../includes/header.php';
             </select>
         </div>
 
-        <div class="col-12">
+        <div class="col-6">
+            <label class="form-label fw-semibold">Objeto (texto resumido) <span class="text-danger">*</span></label>
+            <textarea name="objeto_resumido" class="form-control" rows="2" required><?= sanitize($licitacao['objeto_resumido'] ?? '') ?></textarea>
+        </div>
+
+        <div class="col-6">
             <label class="form-label fw-semibold">Objeto <span class="text-danger">*</span></label>
             <textarea name="objeto" class="form-control" rows="2" required><?= sanitize($licitacao['objeto'] ?? '') ?></textarea>
         </div>
 
         <div class="col-12"><h6 class="text-muted border-bottom pb-1 mt-2">Datas e Valores</h6></div>
 
-        <div class="col-md-3">
+        <div class="col-md">
             <label class="form-label fw-semibold">Data de Abertura</label>
             <input type="date" name="data_abertura" class="form-control"
                    value="<?= sanitize($licitacao['data_abertura'] ?? '') ?>">
         </div>
-        <div class="col-md-3">
+        <div class="col-md">
             <label class="form-label fw-semibold">Previsão de Conclusão</label>
             <input type="date" name="data_prevista_conclusao" class="form-control"
                    value="<?= sanitize($licitacao['data_prevista_conclusao'] ?? '') ?>">
         </div>
-        <div class="col-md-3">
+        <div class="col-md">
             <label class="form-label fw-semibold">Data de Homologação</label>
             <input type="date" name="data_homologacao" class="form-control"
                    value="<?= sanitize($licitacao['data_homologacao'] ?? '') ?>">
         </div>
-        <div class="col-md-3">
+        <div class="col-md">
+            <label class="form-label fw-semibold">Data de Sessão</label>
+            <input type="date" name="data_sessao" class="form-control"
+                   value="<?= sanitize($licitacao['data_sessao'] ?? '') ?>">
+        </div>
+        <div class="col-md">
             <label class="form-label fw-semibold">Valor Estimado (R$)</label>
             <input type="text" name="valor_estimado" class="form-control mask-money"
-                   value="<?= $licitacao['valor_estimado'] ? number_format((float)$licitacao['valor_estimado'], 2, ',', '') : '' ?>">
+                   value="<?= isset($licitacao['valor_estimado']) ? number_format((float)$licitacao['valor_estimado'], 2, ',', '') : '' ?>">
         </div>
 
         <div class="col-12"><h6 class="text-muted border-bottom pb-1 mt-2">Informações Adicionais</h6></div>
@@ -164,10 +178,15 @@ include __DIR__ . '/../../includes/header.php';
             <input type="text" name="responsavel" class="form-control"
                    value="<?= sanitize($licitacao['responsavel'] ?? '') ?>">
         </div>
-        <div class="col-md-8">
+        <div class="col-md-4">
             <label class="form-label fw-semibold">Link no Portal da Transparência / PNCP</label>
             <input type="url" name="link_portal" class="form-control"
                    value="<?= sanitize($licitacao['link_portal'] ?? '') ?>">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Empresa vencedora</label>
+            <input type="text" name="empresa_vencedora" class="form-control"
+                   value="<?= sanitize($licitacao['empresa_vencedora'] ?? '') ?>">
         </div>
 
         <div class="col-12">

@@ -1,7 +1,7 @@
 // ============================================================
 // assets/js/app.js
 // ============================================================
-
+let ultimaAtualizacao = null;
 document.addEventListener('DOMContentLoaded', function () {
 
     // ---- DataTables padrão ----------------------------------
@@ -235,25 +235,6 @@ function initTvSSE(url) {
     if (typeof EventSource !== 'undefined') connect();
 }
 
-function initTvRefresh(intervalSeconds) {
-    const indicator = document.getElementById('tv-refresh-indicator');
-
-    setInterval(function () {
-        if (indicator) {
-            indicator.classList.add('refreshing');
-            setTimeout(function () { indicator.classList.remove('refreshing'); }, 700);
-        }
-
-        fetch(window.location.href + '?json=1')
-            .then(function (r) { return r.json(); })
-            .then(function (data) {
-                updateTvData(data);
-            })
-            .catch(function (e) { console.warn('Refresh falhou:', e); });
-
-    }, intervalSeconds * 1000);
-}
-
 function updateTvData(data) {
     // ── Contadores do resumo ──
     ['vencidos', 'criticos', 'atencao', 'alerta', 'regulares'].forEach(function(k) {
@@ -270,6 +251,7 @@ function updateTvData(data) {
         else if (dias <= 10) { bc='bc-urgente';   bb='b-urgente';   n=dias;    u='DIAS'; }
         else if (dias <= 30) { bc='bc-critico';   bb='b-critico';   n=dias;    u='DIAS'; }
         else if (dias <= 90) { bc='bc-atencao';   bb='b-atencao';   n=dias;    u='DIAS'; }
+        else if (dias <= 180) { bc='bc-alerta';   bb='b-alerta';   n=dias;    u='DIAS'; }
         else                 { bc='bc-tranquilo'; bb='b-tranquilo'; n=dias;    u='DIAS'; }
         var unit = u ? '<span class="badge-unit">' + u + '</span>' : '';
         return '<div class="tv-card ' + bc + '">' +
@@ -296,13 +278,6 @@ function updateTvData(data) {
         var eC = document.getElementById('tv-count-criticos');  if (eC) eC.textContent = criticos.length;
         var eA = document.getElementById('tv-count-atencao');   if (eA) eA.textContent = atencao.length;
         var eT = document.getElementById('tv-count-tranquilo'); if (eT) eT.textContent = tranquilo.length;
-
-        // Passa HTML novo para o escalator — ele re-duplica e reinicia suave
-        if (typeof scrollReset !== 'undefined') {
-            if (scrollReset['criticos'])  scrollReset['criticos'](renderCards(criticos,  '&#10003; Nenhum crítico'));
-            if (scrollReset['atencao'])   scrollReset['atencao'](renderCards(atencao,    '&#10003; Nenhum'));
-            if (scrollReset['tranquilo']) scrollReset['tranquilo'](renderCards(tranquilo,'&#10003; Nenhum'));
-        }
     }
 }
 
@@ -322,7 +297,7 @@ function modalidadeLabel(m) {
     };
     return map[m] || m;
 }
-
+                                                                                                           
 function statusLicitacaoLabel(s) {
     const map = {
         em_andamento: '<span style="color:#48d1ee">Em Andamento</span>',
@@ -330,4 +305,234 @@ function statusLicitacaoLabel(s) {
         homologada: '<span style="color:#5ce89a">Homologada</span>',
     };
     return map[s] || s;
+}
+
+function atualizarLista(categoria, tipo) {    
+    fetch(`list-cards-tv.php?${categoria}=${tipo}`)
+        .then(response => response.text())
+        .then(html => {
+            // Atualiza o conteúdo do container sem recarregar a página
+            if(document.getElementById('tv-section-scroll-'+tipo+'')) document.getElementById('tv-section-scroll-'+tipo+'').innerHTML = html;
+        })
+        .catch(error => console.error('Erro:', error));
+}
+
+function atualizarModal(tipo, hidden = false) {
+    const modais = document.querySelectorAll('.modal');
+    
+    if(!document.getElementById(tipo+'Modal') || hidden) {
+        // Remove a classe 'show' e esconde as modais
+        document.querySelectorAll('.modal.show').forEach(m => {
+            m.classList.remove('show');
+            m.style.display = 'none';
+        });
+
+        // Remove o fundo escuro (backdrop)
+        document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+
+        // Restaura o scroll do corpo da página
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        return;
+    }
+
+    const myModalEl = document.getElementById(tipo+'Modal');
+    const myModal = new bootstrap.Modal(myModalEl, {
+        backdrop: 'static', // Optional: prevents closing when clicking outside
+        keyboard: false     // Optional: prevents closing with Esc key
+    });
+
+    // Initialize the modal instance
+    // Show the modal manually
+    myModal.show();
+}
+
+function atualizarResumo() {
+    const statusLicitacao = {
+        'em_andamento': 'Em andamento',
+        'aguardando_homologacao': 'Aguardando homologação',
+        'homologada': 'Homologada',
+        'deserta': 'Deserta',
+        'fracassada': 'Fracassada',
+        'cancelada': 'Cancelada',
+        'suspensa': 'Suspensa',
+    };
+    const modalidadeLicitacao = {
+        'pregao_eletronico': 'Pregão eletrônico',
+        'pregao_presencial': 'Pregão presencial',
+        'concorrencia': 'Concorrência',
+        'tomada_de_precos': 'Tomada de preços',
+        'convite': 'Convite',
+        'dispensa': 'Dispensa',
+        'inexigibilidade': 'Inexigibilidade',
+        'chamamento_publico': 'Chamamento público',
+    };
+    fetch( window.location.href + '?json=1')
+        .then(response => response.json())
+        .then(data => {
+            var criticosHidden = (Number(data.resumo.vencido_hid) + Number(data.resumo.critico_hid));            
+            var atencaoHidden = Number(data.resumo.atencao_hid);
+            var tranquiloHidden = (Number(data.resumo.alerta_hid) + Number(data.resumo.regular_hid));
+
+            var countColLic = 0;
+            var countResLic = 0;
+            countResLic = cardLicitacao(data.resumo_licitacoes.deserta, 'tv-stat-deserta', countResLic);
+            countResLic = cardLicitacao(data.resumo_licitacoes.fracassada, 'tv-stat-fracassada', countResLic);
+            //Se countResLic > 0, logo a deserta e a fracassada já são testadas
+            countColLic = cardLicitacao(countResLic, 'tv-section-deserta', countColLic);
+            countColLic = cardLicitacao(data.resumo_licitacoes.em_andamento, 'tv-section-andamento', countColLic);
+            countColLic = cardLicitacao(data.resumo_licitacoes.homologada, 'tv-section-homologada', countColLic);
+
+            countResLic = cardLicitacao(data.resumo_licitacoes.em_andamento, 'tv-stat-andamento', countResLic);
+            countResLic = cardLicitacao(data.resumo_licitacoes.homologada, 'tv-stat-homologada', countResLic);
+
+            if(countColLic){
+                document.getElementById('tv-main-licitacao').className = 'item-licitacao tv-main-'+countColLic+'col';
+            } else {
+                document.getElementById('tv-main-licitacao').className = 'd-none';
+            }
+
+            if(countResLic){
+                document.getElementById('tv-cards-resumo-licitacao').className = 'item-licitacao tv-cards-licitacao-'+countResLic+'col';
+            } else {
+                document.getElementById('tv-cards-resumo-licitacao').className = 'd-none';
+            }
+
+            document.getElementById('tv-num-vencidos').innerHTML = data.resumo.vencido || 0;
+            document.getElementById('tv-num-criticos').innerHTML = data.resumo.critico || 0;
+            document.getElementById('tv-num-atencao').innerHTML = data.resumo.atencao || 0;
+            document.getElementById('tv-num-alerta').innerHTML = data.resumo.alerta || 0;
+            document.getElementById('tv-num-regulares').innerHTML = data.resumo.regular || 0;
+
+            document.getElementById('tv-num-fracassada').innerHTML = data.resumo_licitacoes.fracassada || 0;
+            document.getElementById('tv-num-deserta').innerHTML = data.resumo_licitacoes.deserta || 0;
+            document.getElementById('tv-num-andamento').innerHTML = data.resumo_licitacoes.em_andamento || 0;
+            document.getElementById('tv-num-homologada').innerHTML = data.resumo_licitacoes.homologada || 0;
+
+            document.getElementById('tv-count-criticos').innerHTML = (Number(data.resumo.vencido) + Number(data.resumo.critico)) || 0;
+            document.getElementById('tv-count-criticos-hidden').innerHTML = criticosHidden > 0 ? '&nbsp;|&nbsp;<i class="bi bi-eye-slash"></i>' + criticosHidden : '';
+            document.getElementById('tv-count-atencao').innerHTML = data.resumo.atencao || 0;
+            document.getElementById('tv-count-atencao-hidden').innerHTML = atencaoHidden > 0 ? '&nbsp;|&nbsp;<i class="bi bi-eye-slash"></i>' + atencaoHidden : '';
+            document.getElementById('tv-count-tranquilo').innerHTML = (Number(data.resumo.alerta) + Number(data.resumo.regular)) || 0;
+            document.getElementById('tv-count-tranquilo-hidden').innerHTML = tranquiloHidden > 0 ? '&nbsp;|&nbsp;<i class="bi bi-eye-slash"></i>' + tranquiloHidden : '';
+
+            document.getElementById('tv-count-deserta').innerHTML = (Number(data.resumo_licitacoes.deserta) + Number(data.resumo_licitacoes.fracassada)) || 0;
+            document.getElementById('tv-count-andamento').innerHTML = data.resumo_licitacoes.em_andamento || 0;
+            document.getElementById('tv-count-homologada').innerHTML = data.resumo_licitacoes.homologada || 0;
+            
+            document.getElementById('tv-section-scroll-tranquilo').style.setProperty('--time-tranquilo', data.controles.velocidade_contrato_tranquilo + 's');
+            document.getElementById('tv-section-scroll-atencao').style.setProperty('--time-atencao', data.controles.velocidade_contrato_atencao + 's');
+            document.getElementById('tv-section-scroll-critico').style.setProperty('--time-critico', data.controles.velocidade_contrato_critico + 's');
+            document.getElementById('tv-section-scroll-critico').style.setProperty('--time-critico', data.controles.velocidade_contrato_critico + 's');
+            document.getElementById('tv-cards-resumo-licitacao').style.setProperty('--time-transition', data.controles.transicao + 's');
+            document.getElementById('tv-main-licitacao').style.setProperty('--time-transition', data.controles.transicao + 's');
+            
+            if((Number(data.resumo_licitacoes.homologada) >= 3)) document.getElementById('tv-section-scroll-homologada').style.setProperty('--time-homologada', data.controles.velocidade_licitacao_homologada + 's');
+            else document.getElementById('tv-section-scroll-homologada').style.setProperty('--time-homologada', '0s');
+            if((Number(data.resumo_licitacoes.em_andamento) >= 3)) document.getElementById('tv-section-scroll-andamento').style.setProperty('--time-andamento', data.controles.velocidade_licitacao_andamento + 's');
+            else document.getElementById('tv-section-scroll-andamento').style.setProperty('--time-andamento', '0s');
+            if((Number(data.resumo_licitacoes.deserta) + Number(data.resumo_licitacoes.fracassada) >= 3)) document.getElementById('tv-section-scroll-deserta').style.setProperty('--time-deserta', data.controles.velocidade_licitacao_deserta + 's');
+            else document.getElementById('tv-section-scroll-deserta').style.setProperty('--time-deserta', '0s');
+            
+            verificaScroll(Number(data.resumo.vencido) + Number(data.resumo.critico) - Number(criticosHidden), 'critico', 'contrato');
+            verificaScroll(Number(data.resumo.atencao) - Number(atencaoHidden), 'atencao', 'contrato');
+            verificaScroll(Number(data.resumo.alerta) + Number(data.resumo.regular) - Number(tranquiloHidden), 'tranquilo', 'contrato');
+            
+            verificaScroll(Number(data.resumo_licitacoes.deserta) + Number(data.resumo_licitacoes.fracassada), 'deserta', 'licitacao');
+            verificaScroll(Number(data.resumo_licitacoes.em_andamento), 'andamento', 'licitacao');
+            verificaScroll(Number(data.resumo_licitacoes.homologada), 'homologada', 'licitacao');
+
+            var tipo = (data.controles.modal).split("_");
+            var time = data.controles.created_at;
+            var hiddenModal = false;
+            
+            if(document.getElementById('num_contrato' + tipo[1]) && tipo[0] == 'contrato'){ //Referente a modal contrato
+                document.getElementById('header-modal-contrato').setAttribute("class", "modal-header text-white " + document.getElementById('bg_contrato' + tipo[1]).innerHTML);
+                if(convertTimeAddSeconds(time) >= currentTime()){
+                    document.getElementById('num_contrato').innerHTML = document.getElementById('num_contrato' + tipo[1]).innerHTML;
+                    document.getElementById('fornecedor_display').innerHTML = document.getElementById('fornecedor_display' + tipo[1]).innerHTML;
+                    document.getElementById('numero_processo_contrato').innerHTML = document.getElementById('numero_processo_contrato' + tipo[1]).innerHTML;
+                    document.getElementById('objeto_contrato').innerHTML = document.getElementById('objeto_contrato' + tipo[1]).innerHTML;
+                    document.getElementById('valor_contrato').innerHTML = document.getElementById('valor_contrato' + tipo[1]).innerHTML;
+                    document.getElementById('data_assinatura').innerHTML = document.getElementById('data_assinatura' + tipo[1]).innerHTML;
+                    document.getElementById('dias_para_vencer').innerHTML = document.getElementById('dias_para_vencer' + tipo[1]).innerHTML;
+                    document.getElementById('data_inicio').innerHTML = document.getElementById('data_inicio' + tipo[1]).innerHTML;
+                    document.getElementById('data_vencimento').innerHTML = document.getElementById('data_vencimento' + tipo[1]).innerHTML;
+                } else {
+                    hiddenModal = true;
+                }
+            } else if(document.getElementById('num_licitacao' + tipo[1]) && tipo[0] == 'licitacao') { //Referente a modal licitacao
+                document.getElementById('header-modal-licitacao').setAttribute("class", "modal-header text-white " + document.getElementById('bg_licitacao' + tipo[1]).innerHTML);
+                if(convertTimeAddSeconds(time) >= currentTime()){
+                    document.getElementById('num_licitacao').innerHTML = document.getElementById('num_licitacao' + tipo[1]).innerHTML;
+                    document.getElementById('status').innerHTML = statusLicitacao[document.getElementById('status' + tipo[1]).innerHTML];
+                    document.getElementById('modalidade').innerHTML = modalidadeLicitacao[document.getElementById('modalidade' + tipo[1]).innerHTML];
+                    document.getElementById('num_licitacao').innerHTML = document.getElementById('num_licitacao' + tipo[1]).innerHTML;
+                    document.getElementById('numero_processo_licitacao').innerHTML = document.getElementById('numero_processo_licitacao' + tipo[1]).innerHTML;
+                    document.getElementById('objeto_licitacao').innerHTML = document.getElementById('objeto_licitacao' + tipo[1]).innerHTML;
+                    document.getElementById('empresa_vencedora').innerHTML = document.getElementById('empresa_vencedora' + tipo[1]).innerHTML;
+                    document.getElementById('valor_licitacao').innerHTML = document.getElementById('valor_licitacao' + tipo[1]).innerHTML;
+                    document.getElementById('data_abertura').innerHTML = document.getElementById('data_abertura' + tipo[1]).innerHTML;
+                    document.getElementById('data_sessao').innerHTML = document.getElementById('data_sessao' + tipo[1]).innerHTML;
+                    document.getElementById('data_homologacao').innerHTML = document.getElementById('data_homologacao' + tipo[1]).innerHTML;
+                } else {
+                    hiddenModal = true;
+                }
+            } else {
+                hiddenModal = true;
+            }
+            atualizarModal(tipo[0], hiddenModal);
+        }).catch(error => console.error('Erro:', error));
+}
+
+function verificaScroll(value, tipo, modalidade) {
+    if(modalidade == 'contrato') {
+        if(value < 8) {
+            document.getElementById('tv-section-scroll-' + tipo).classList.remove('tv-section-scroll-' + tipo);
+        } else {
+            document.getElementById('tv-section-scroll-' + tipo).classList.add('tv-section-scroll-' + tipo);
+        }
+    } else if(modalidade == 'licitacao') {
+        if(value < 4) {
+            document.getElementById('tv-section-scroll-' + tipo).classList.remove('tv-section-scroll-' + tipo);
+        } else {
+            document.getElementById('tv-section-scroll-' + tipo).classList.add('tv-section-scroll-' + tipo);
+        }
+    }
+    
+    
+}
+
+function atualizarListas() {
+    setInterval(() => {
+        atualizarResumo();
+        atualizarLista('contrato', 'critico');
+        atualizarLista('contrato', 'atencao');
+        atualizarLista('contrato', 'tranquilo');
+        atualizarLista('licitacao', 'deserta');
+        atualizarLista('licitacao', 'homologada');
+        atualizarLista('licitacao', 'andamento');
+    }, 5000);
+}
+
+function currentTime() {
+    return new Date();
+}
+
+function convertTimeAddSeconds(stringData, secondsToAdd = 35) {
+    const convertedDate = new Date(stringData.replace(" ", "T"));
+    convertedDate.setSeconds(convertedDate.getSeconds() + secondsToAdd);
+    return convertedDate;
+}
+
+function cardLicitacao(qtd, id, count) {
+    if(Number(qtd)){
+        document.getElementById(id).classList.remove('d-none');
+        count++;
+    } else {
+        document.getElementById(id).classList.add('d-none');
+    }
+    return count;
+    
 }
