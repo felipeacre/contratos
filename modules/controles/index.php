@@ -3,35 +3,53 @@ require_once __DIR__ . '/../../includes/bootstrap.php';
 Auth::require_login();
 
 $db = Database::get();
-$stmt = $db->prepare('SELECT * FROM controles');
-$controle = $db->query('SELECT * FROM controles')->fetch() ?: [];
+$controle = $db->query('SELECT * FROM controles WHERE user_id = 1')->fetch() ?: [];
 $modal = explode('_', $controle['modal'] ?? '');
 $ultimoPesquisado = empty($controle['modal']) ? 'Ex. 19/2024' : 'Último: ' . str_replace('-', '/', $modal[1] ?? '');
-// SALVAR
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $f = $_POST;
+    $modal_val = (!empty($f['modal']) && !empty($f['tipo']))
+        ? $f['tipo'] . '_' . trim(str_replace('/', '-', $f['modal']))
+        : ($controle['modal'] ?? null);
+
     $data = [
-        'velocidade_contrato_tranquilo' => empty($f['velocidade_contrato_tranquilo']) ? 30 : trim($f['velocidade_contrato_tranquilo']),
-        'velocidade_contrato_atencao' => empty($f['velocidade_contrato_atencao']) ? 30 : trim($f['velocidade_contrato_atencao']),
-        'velocidade_contrato_critico' => empty($f['velocidade_contrato_critico']) ? 30 : trim($f['velocidade_contrato_critico']),
-        'velocidade_licitacao_homologada' => empty($f['velocidade_licitacao_homologada']) ? 30 : trim($f['velocidade_licitacao_homologada']),
-        'velocidade_licitacao_andamento' => empty($f['velocidade_licitacao_andamento']) ? 30 : trim($f['velocidade_licitacao_andamento']),
-        'velocidade_licitacao_deserta' => empty($f['velocidade_licitacao_deserta']) ? 30 : trim($f['velocidade_licitacao_deserta']),
-        'transicao' => empty($f['transicao']) ? 60 : trim($f['transicao']),
+        'user_id'                        => 1,
+        'modal'                          => $modal_val,
+        'velocidade_contrato_tranquilo'  => (int) ($f['velocidade_contrato_tranquilo'] ?? 30) ?: 30,
+        'velocidade_contrato_atencao'    => (int) ($f['velocidade_contrato_atencao'] ?? 30) ?: 30,
+        'velocidade_contrato_critico'    => (int) ($f['velocidade_contrato_critico'] ?? 30) ?: 30,
+        'velocidade_licitacao_homologada'=> (int) ($f['velocidade_licitacao_homologada'] ?? 30) ?: 30,
+        'velocidade_licitacao_andamento' => (int) ($f['velocidade_licitacao_andamento'] ?? 30) ?: 30,
+        'velocidade_licitacao_deserta'   => (int) ($f['velocidade_licitacao_deserta'] ?? 30) ?: 30,
+        'transicao'                      => (int) ($f['transicao'] ?? 60) ?: 60,
+        'created_at'                     => $controle['created_at'] ?? date('Y-m-d H:i:s'),
     ];
-    if(!empty($f['modal'])){
-        $data['modal'] = $f['tipo'].'_'.trim(str_replace('/', '-', $f['modal']));
-        $data['created_at'] = date('Y-m-d H:i:s');
-    }
+
     try {
-        //code...
-        $set = implode(', ', array_map(fn($k) => "$k = :$k", array_keys($data)));
-        $stmt = $db->prepare("UPDATE controles SET $set WHERE user_id = 1");
-        $stmt->execute($data);
+        $db->prepare("
+            INSERT INTO controles
+                (user_id, modal, velocidade_contrato_tranquilo, velocidade_contrato_atencao,
+                 velocidade_contrato_critico, velocidade_licitacao_homologada,
+                 velocidade_licitacao_andamento, velocidade_licitacao_deserta, transicao, created_at)
+            VALUES
+                (:user_id, :modal, :velocidade_contrato_tranquilo, :velocidade_contrato_atencao,
+                 :velocidade_contrato_critico, :velocidade_licitacao_homologada,
+                 :velocidade_licitacao_andamento, :velocidade_licitacao_deserta, :transicao, :created_at)
+            ON DUPLICATE KEY UPDATE
+                modal                           = VALUES(modal),
+                velocidade_contrato_tranquilo   = VALUES(velocidade_contrato_tranquilo),
+                velocidade_contrato_atencao     = VALUES(velocidade_contrato_atencao),
+                velocidade_contrato_critico     = VALUES(velocidade_contrato_critico),
+                velocidade_licitacao_homologada = VALUES(velocidade_licitacao_homologada),
+                velocidade_licitacao_andamento  = VALUES(velocidade_licitacao_andamento),
+                velocidade_licitacao_deserta    = VALUES(velocidade_licitacao_deserta),
+                transicao                       = VALUES(transicao)
+        ")->execute($data);
     } catch (\Throwable $th) {
-       die($th->getMessage());
+        die($th->getMessage());
     }
-    
+
     redirect(BASE_URL . '/modules/controles/index.php');
 }
 
