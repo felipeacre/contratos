@@ -59,7 +59,7 @@ if(!empty($resumoLicitacoes['em_andamento'])){
 }
 if(!empty($countColLic)){
     $showLicitacao = 'item-licitacao';
-    $timeTransition = "--time-transition: {$controles['transicao']}s;";
+    $timeTransition = "--time-transition: " . ($controles['transicao'] ?? 60) . "s;";
 } 
 // echo $countColLic;exit;
 
@@ -188,9 +188,9 @@ if ($json_mode) {
         $styleDesertaFracassada = '';
         $styleAndamento = '';
         $styleHomologada = '';
-        if($qtdDesertaFracassada >= 3) $styleDesertaFracassada = "--time-deserta: {$controles['velocidade_licitacao_deserta']}s;";
-        if($qtdAndamento >= 3) $styleAndamento = "--time-andamento: {$controles['velocidade_licitacao_andamento']}s;";
-        if($qtdHomologada >= 3) $styleHomologada = "--time-homologada: {$controles['velocidade_licitacao_homologada']}s;";
+        if($qtdDesertaFracassada >= 3) $styleDesertaFracassada = "--time-deserta: " . ($controles['velocidade_licitacao_deserta'] ?? 30) . "s;";
+        if($qtdAndamento >= 3) $styleAndamento = "--time-andamento: " . ($controles['velocidade_licitacao_andamento'] ?? 30) . "s;";
+        if($qtdHomologada >= 3) $styleHomologada = "--time-homologada: " . ($controles['velocidade_licitacao_homologada'] ?? 30) . "s;";
         ?>
         <div class="tv-header-date">
             <div class="tv-date"><?= $data_pt ?></div>
@@ -255,7 +255,7 @@ if ($json_mode) {
                 </span>
             </div>
             <div class="tv-section-body">
-                <div class="tv-section-scroll" id="tv-section-scroll-critico" style="--time-critico: <?=$controles['velocidade_contrato_critico']?>s;">
+                <div class="tv-section-scroll" id="tv-section-scroll-critico" style="--time-critico: <?=$controles['velocidade_contrato_critico'] ?? 30?>s;">
                     <?php if (empty($tv_criticos)): ?>
                         <div class="tv-empty-msg">&#10003; Nenhum contrato crítico</div>
                     <?php else:
@@ -284,7 +284,7 @@ if ($json_mode) {
                 </span>
             </div>
             <div class="tv-section-body">
-                <div class="tv-section-scroll" id="tv-section-scroll-atencao" style="--time-atencao: <?=$controles['velocidade_contrato_atencao']?>s;">
+                <div class="tv-section-scroll" id="tv-section-scroll-atencao" style="--time-atencao: <?=$controles['velocidade_contrato_atencao'] ?? 30?>s;">
                     <?php if (empty($tv_atencao)): ?>
                         <div class="tv-empty-msg">&#10003; Nenhum</div>
                     <?php else:
@@ -313,7 +313,7 @@ if ($json_mode) {
                 </span>
             </div>
             <div class="tv-section-body">
-                <div class="tv-section-scroll" id="tv-section-scroll-tranquilo" style="--time-tranquilo: <?=$controles['velocidade_contrato_tranquilo']?>s;">
+                <div class="tv-section-scroll" id="tv-section-scroll-tranquilo" style="--time-tranquilo: <?=$controles['velocidade_contrato_tranquilo'] ?? 30?>s;">
                     <?php if (!empty($tv_tranquilo)):
                         foreach ($tv_tranquilo as $c):
                             echo tv_card($c);
